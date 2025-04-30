@@ -32,6 +32,9 @@ class ChatRequest(BaseModel):
 
 
 def initialize_system():
+    # Initialize embedding model (this should happen in both cases)
+    embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+
     # Load or create embeddings
     if os.path.exists(EMBEDDINGS_FILE) and os.path.exists(INDEX_FILE) and os.path.exists(DOCUMENTS_FILE):
         print("Loading precomputed embeddings...")
@@ -53,7 +56,6 @@ def initialize_system():
                 documents.append({'text': chunk, 'url': page['url']})
 
         # Create and save embeddings
-        embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
         embeddings = embedding_model.encode([doc['text'] for doc in documents])
         np.save(EMBEDDINGS_FILE, embeddings)
 
@@ -68,7 +70,6 @@ def initialize_system():
             json.dump(documents, f, ensure_ascii=False, indent=2)
 
     return embedding_model, index, documents
-
 
 # Initialize system at startup
 embedding_model, index, documents = initialize_system()
